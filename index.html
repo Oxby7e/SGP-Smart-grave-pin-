@@ -245,10 +245,11 @@
         @media(min-width: 600px) {
             .security-footer { flex-direction: row; justify-content: space-between; align-items: center; }
         }
-        .sec-row { display: flex; align-items: center; gap: 8px; color: var(--text-secondary); }
+        .sec-row { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; color: var(--text-secondary); width: 100%; }
         .badge-green {
             background: rgba(52, 211, 153, 0.1); color: var(--accent-green);
-            padding: 4px 8px; border-radius: 12px; display: flex; align-items: center; gap: 4px; border: 1px solid rgba(52, 211, 153, 0.2);
+            padding: 4px 10px; border-radius: 12px; display: flex; align-items: center; gap: 4px; border: 1px solid rgba(52, 211, 153, 0.2);
+            white-space: nowrap; flex-shrink: 0;
         }
 
         svg { fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
