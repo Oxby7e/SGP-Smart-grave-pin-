@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <!-- Premium dark slate theme color -->
+    <meta name="theme-color" content="#1c2431">
+    <title>SGP Site A-142 | Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:ital,wght@0,500;0,700;1,500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #1c2431;
+            --surface-color: #252f3f;
+            --surface-hover: #2d3846;
+            --border-color: rgba(255, 255, 255, 0.06);
+            --text-primary: #e2e8f0;
+            --text-secondary: #8a94a6;
+            --accent-gold-text: #debc78;
+            --accent-gold-bg: #463f2b;
+            --accent-cyan-text: #153e4b;
+            --accent-cyan-bg: #84bcd1;
+            --accent-green: #34d399;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* ----- SCREEN 1: LIST VIEW (unchanged layout, matching colors) ----- */
+        .app-header {
+            padding: 20px 20px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-shrink: 0;
+            border-bottom: 1px solid var(--border-color);
+            background: var(--bg-color);
+        }
+        .logo-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.25rem;
+            color: #fff;
+        }
+        .header-subtitle { font-size: 0.75rem; color: var(--text-secondary); }
+        .site-badge {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .site-badge::before {
+            content: ''; width: 6px; height: 6px; border-radius: 50%;
+            background: var(--accent-cyan-bg); box-shadow: 0 0 6px var(--accent-cyan-bg);
+        }
+        
+        .record-list {
+            flex: 1; overflow-y: auto; display: flex; flex-direction: column;
+            padding-bottom: 90px;
+        }
+        .list-item {
+            display: flex; align-items: center; padding: 0 20px; height: 80px;
+            cursor: pointer; position: relative; border-bottom: 1px solid var(--border-color);
+        }
+        .list-item:hover { background-color: var(--surface-hover); }
+        .avatar {
+            width: 50px; height: 50px; border-radius: 50%;
+            background-color: var(--surface-color); border: 1px solid var(--border-color);
+            display: flex; align-items: center; justify-content: center;
+            margin-right: 16px; flex-shrink: 0;
+            color: var(--text-secondary); font-family: 'Playfair Display', serif; font-size: 1.2rem;
+        }
+        .item-content { flex: 1; display: flex; flex-direction: column; justify-content: center; min-width: 0; }
+        .item-row-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+        .item-name {
+            font-family: 'Playfair Display', serif; font-size: 1.15rem; color: #fff;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+        .item-date { font-size: 0.75rem; color: var(--text-secondary); }
+        .item-row-bottom { display: flex; align-items: center; }
+        .layer-badge {
+            font-size: 0.65rem; background: var(--surface-color); color: var(--text-secondary);
+            padding: 3px 8px; border-radius: 6px; margin-right: 10px; flex-shrink: 0;
+            text-transform: uppercase;
+        }
+        .current-layer { background: var(--accent-gold-bg); color: var(--accent-gold-text); }
+        .item-preview { font-size: 0.85rem; color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1; }
+
+        .actions-panel {
+            position: fixed; bottom: 0; left: 0; width: 100%; padding: 16px 20px 24px;
+            background: linear-gradient(0deg, #1c2431 70%, transparent 100%);
+            display: flex; gap: 12px; z-index: 50;
+        }
+        .btn {
+            height: 52px; border-radius: 14px; display: flex; align-items: center; justify-content: center;
+            gap: 10px; font-size: 0.95rem; font-weight: 500; cursor: pointer; border: none;
+        }
+        .btn-call { flex: 1; background: var(--surface-color); color: var(--text-primary); border: 1px solid var(--border-color); }
+        .btn-navigate { flex: 3; background: #fff; color: #020617; font-weight: 600; }
+
+
+        /* ----- SCREEN 2: DETAIL DASHBOARD ----- */
+        .detail-view {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: var(--bg-color); z-index: 100;
+            transform: translateX(100%); transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
+            display: flex; flex-direction: column;
+        }
+        .detail-view.active { transform: translateX(0); }
+
+        .detail-header-bar {
+            padding: 16px 20px; display: flex; align-items: center; border-bottom: 1px solid var(--border-color);
+        }
+        .back-btn {
+            background: var(--surface-color); border: 1px solid var(--border-color); color: var(--text-primary);
+            display: flex; align-items: center; justify-content: center; width: 40px; height: 40px;
+            border-radius: 50%; cursor: pointer; margin-right: 16px;
+        }
+
+        .dashboard-content { flex: 1; overflow-y: auto; padding: 24px 20px; }
+
+        /* Dashboard Top Header */
+        .dash-header { text-align: center; margin-bottom: 24px; }
+        .pill-gold {
+            display: inline-block; background: var(--accent-gold-bg); color: var(--accent-gold-text);
+            padding: 6px 16px; border-radius: 20px; font-size: 0.75rem; font-weight: 600;
+            text-transform: uppercase; margin-bottom: 12px; letter-spacing: 0.5px;
+        }
+        .dash-title {
+            font-family: 'Playfair Display', serif; font-size: 2.2rem; font-weight: 500;
+            color: #fff; margin-bottom: 4px;
+        }
+        .dash-dates { font-size: 1rem; color: var(--accent-gold-text); letter-spacing: 1px; font-weight: 500; margin-bottom: 16px;}
+
+        /* Dashboard Cards Base */
+        .card-dash {
+            background-color: var(--surface-color); border: 1px solid var(--border-color);
+            border-radius: 12px; padding: 20px; margin-bottom: 16px;
+        }
+        .card-label {
+            font-size: 0.7rem; color: var(--text-secondary); text-transform: uppercase;
+            letter-spacing: 1px; margin-bottom: 16px; font-weight: 600;
+        }
+
+        /* Epitaph Card */
+        .epitaph-text {
+            font-family: 'Playfair Display', serif; font-style: italic; color: #fff;
+            font-size: 1.15rem; line-height: 1.5; text-align: center; margin: 10px 0;
+        }
+
+        /* Grid Layout */
+        .dash-grid { display: grid; grid-template-columns: 1fr; gap: 16px; margin-bottom: 16px; }
+        @media(min-width: 900px) {
+            .dash-grid { grid-template-columns: 1fr 1fr 1fr; }
+        }
+
+        /* Left Column: Archive Info */
+        .row-data { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 14px; font-size: 0.85rem; }
+        .row-data .label { color: var(--text-secondary); }
+        .row-data .value { color: var(--text-primary); text-align: right; }
+        .link-text { color: var(--accent-cyan-bg); text-decoration: none; display: block; margin-bottom: 4px; }
+        .link-text:hover { text-decoration: underline; }
+
+        /* Middle Column: Portrait */
+        .album-col { display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .album-subtitle { font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 1px;}
+        .portrait-container {
+            width: 90px;
+            height: 110px;
+            margin-bottom: 15px;
+            border: 3px solid rgba(255,255,255,0.1);
+            border-radius: 6px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+            background: var(--surface-hover);
+        }
+        .portrait-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            filter: grayscale(60%) sepia(20%);
+        }
+        
+        .btn-gold-pill {
+            background: var(--accent-gold-bg); color: var(--accent-gold-text);
+            border: none; border-radius: 20px; padding: 6px 20px; font-size: 0.8rem; font-weight: 500; cursor: pointer;
+        }
+
+        /* Right Column: Map & Nav */
+        .map-card { padding: 0; overflow: hidden; display: flex; margin-bottom: 16px;}
+        .map-bg {
+            flex: 1; min-height: 120px;
+            background-color: #222d3b;
+            background-image: 
+                linear-gradient(rgba(255,255,255,0.08) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.08) 1px, transparent 1px);
+            background-size: 24px 24px; background-position: center;
+            position: relative; overflow: hidden;
+        }
+        .map-block {
+            position: absolute; left: calc(50% + 4px); top: calc(50% - 24px); 
+            width: 23px; height: 47px; background: rgba(222, 188, 120, 0.5); 
+        }
+        .pin {
+            position: absolute; left: calc(50% + 6px); top: calc(50% - 15px);
+            width: 18px; height: 18px;
+            background: var(--accent-gold-text);
+            border-radius: 50% 50% 50% 0;
+            transform: rotate(-45deg);
+            box-shadow: -2px 2px 6px rgba(0,0,0,0.5);
+            display: flex; align-items: center; justify-content: center;
+        }
+        .pin::after {
+            content: ''; width: 6px; height: 6px; background: #222d3b; border-radius: 50%;
+        }
+        .map-info { padding: 20px; display: flex; flex-direction: column; justify-content: center; background: var(--surface-color); border-left: 1px solid var(--border-color); }
+        .map-site-name { font-size: 0.95rem; margin-bottom: 12px; }
+        .btn-cyan {
+            background: var(--accent-cyan-bg); color: var(--accent-cyan-text);
+            border: none; border-radius: 20px; padding: 8px 16px; font-size: 0.8rem; font-weight: 600; cursor: pointer;
+        }
+
+        .nav-link-card {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 16px 20px; cursor: pointer;
+        }
+        .nav-link-left { display: flex; align-items: center; gap: 12px; font-size: 0.95rem; }
+
+        /* Security Footer */
+        .security-footer {
+            display: flex; flex-direction: column; gap: 12px; font-size: 0.8rem;
+        }
+        @media(min-width: 600px) {
+            .security-footer { flex-direction: row; justify-content: space-between; align-items: center; }
+        }
+        .sec-row { display: flex; align-items: center; gap: 8px; color: var(--text-secondary); }
+        .badge-green {
+            background: rgba(52, 211, 153, 0.1); color: var(--accent-green);
+            padding: 4px 8px; border-radius: 12px; display: flex; align-items: center; gap: 4px; border: 1px solid rgba(52, 211, 153, 0.2);
+        }
+
+        svg { fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+        .solid-icon { fill: currentColor; stroke: none; }
+    </style>
+</head>
+<body>
+
+    <!-- SCREEN 1: LIST VIEW -->
+    <div class="app-header">
+        <div class="header-info">
+            <span class="logo-title">Smart Grave Pin</span>
+            <span class="header-subtitle">(SGP) System</span>
+        </div>
+        <div class="site-badge">Pole A-142</div>
+    </div>
+
+    <div class="record-list" id="recordList"></div>
+
+    <div class="actions-panel">
+        <button class="btn btn-call" onclick="alert('Calling Khadim...')">
+            <svg width="20" height="20" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+        </button>
+        <button class="btn btn-navigate" onclick="alert('GPS Nav Start')">
+            <svg class="solid-icon" width="20" height="20" viewBox="0 0 24 24"><path d="M21 3L3 10.53v.98l6.84 2.65L12.48 21h.98L21 3z"></path></svg>
+            Navigate to Site
+        </button>
+    </div>
+
+
+    <!-- SCREEN 2: DETAIL DASHBOARD -->
+    <div class="detail-view" id="detailView">
+        <div class="detail-header-bar">
+            <button class="back-btn" onclick="closeDetails()">
+                <svg width="20" height="20" viewBox="0 0 24 24"><path d="M19 12H5"></path><path d="M12 19l-7-7 7-7"></path></svg>
+            </button>
+            <span style="font-size:0.9rem; color:var(--text-secondary)">Digital Monument Dashboard</span>
+        </div>
+
+        <div class="dashboard-content">
+            
+            <div class="dash-header">
+                <div class="pill-gold" id="dashLayerId">CURRENT BURIAL</div>
+                <h1 class="dash-title" id="dashName">Syed Rahman</h1>
+                <div class="dash-dates" id="dashDates">1940 – 2024</div>
+            </div>
+
+            <!-- EPITAPH -->
+            <div class="card-dash">
+                <div class="card-label">EPITAPH / INSCRIPTION</div>
+                <div class="epitaph-text" id="dashEpitaph">"In loving memory of a devoted father and grandfather. Forever in our hearts."</div>
+            </div>
+
+            <!-- 3 COLUMN GRID -->
+            <div class="dash-grid">
+                
+                <!-- COL 1: ARCHIVE INFO -->
+                <div class="card-dash" style="margin-bottom:0">
+                    <div class="card-label">ARCHIVE INFORMATION</div>
+                    <div class="row-data">
+                        <span class="label">Buried On</span>
+                        <span class="value" id="dashBuriedOn">14 Feb 2024</span>
+                    </div>
+                    <div class="row-data">
+                        <span class="label">Database Ref</span>
+                        <span class="value" id="dashRef">A-142-3</span>
+                    </div>
+
+                    <div class="card-label" style="margin-top: 24px;">LEGACY ARCHIVE & BURIAL CHAIN</div>
+                    <div class="row-data" style="flex-direction: column;">
+                        <span class="label" style="margin-bottom:8px">LAYERED RECORDS:</span>
+                        <div style="padding-left: 10px; text-align: left; width: 100%;">
+                            <a href="#" class="link-text">Site A-142-1 (Hamid ul-Haq, 1899-1941)</a>
+                            <a href="#" class="link-text">Site A-142-2 (Amina Begum, 1928-1985)</a>
+                        </div>
+                    </div>
+                    
+                    <div class="row-data" style="margin-top: 16px;">
+                        <span class="label">MANAGEMENT:</span>
+                        <a href="#" class="link-text" style="margin-bottom:0">Contact Cemetery Manager (Khadim)</a>
+                    </div>
+                </div>
+
+                <!-- COL 2: PORTRAIT -->
+                <div class="card-dash album-col" style="margin-bottom:0">
+                    <div class="album-subtitle">In Memory Of</div>
+                    <div class="portrait-container">
+                        <img id="dashPortrait" class="portrait-img" src="https://i.pravatar.cc/150?u=1" alt="Portrait" />
+                    </div>
+                    <button class="btn-gold-pill">View Tribute</button>
+                </div>
+
+                <!-- COL 3: MAP -->
+                <div style="display: flex; flex-direction: column; height: 100%;">
+                    <div class="card-dash map-card" style="flex: 1;">
+                        <div class="map-bg">
+                            <div class="map-block"></div>
+                            <div class="pin"></div>
+                        </div>
+                        <div class="map-info">
+                            <div class="map-site-name">Site A-142</div>
+                            <button class="btn-cyan">Get Navigation</button>
+                        </div>
+                    </div>
+                    <div class="card-dash nav-link-card" style="margin-bottom: 0;">
+                        <div class="nav-link-left">
+                            <svg class="solid-icon" style="color:var(--accent-cyan-bg)" width="20" height="20" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+                            <span>Navigation</span>
+                        </div>
+                        <svg width="18" height="18" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"></path></svg>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+        <div style="padding: 0 20px 20px; flex-shrink: 0; z-index: 10;">
+            <!-- SECURITY FOOTER -->
+            <div class="card-dash security-footer" style="margin-bottom: 0;">
+                <div class="sec-row">
+                    Security &nbsp;&nbsp;|&nbsp;&nbsp; RECORD INTEGRITY
+                    <div class="badge-green">Ledger Verified: ...</div>
+                </div>
+                <div class="sec-row" style="color:var(--text-primary)">
+                    Blockchain Hash: 
+                    <div class="badge-green">
+                        <svg class="solid-icon" width="14" height="14" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                        Ledger Verified
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const records = [
+            {
+                id: 1, name: "Syed Rahman", dates: "1940 – 2024", layerTitle: "CURRENT BURIAL", isCurrent: true,
+                epitaph: "\"In loving memory of a devoted father and grandfather. Forever in our hearts.\"",
+                buriedOn: "14 Feb 2024", plotId: "A-142-3", preview: "In loving memory of a devoted father...",
+                photo: "https://randomuser.me/api/portraits/men/57.jpg"
+            },
+            {
+                id: 2, name: "Amina Begum", dates: "1928 – 1985", layerTitle: "LAYER 2 (HISTORICAL)", isCurrent: false,
+                epitaph: "\"A life bound by grace and kindness. Reunited in peace.\"",
+                buriedOn: "03 Nov 1985", plotId: "A-142-2", preview: "A life bound by grace and kindness...",
+                photo: "https://randomuser.me/api/portraits/women/62.jpg"
+            },
+            {
+                id: 3, name: "Hamid ul-Haq", dates: "1899 – 1941", layerTitle: "LAYER 3 (HISTORICAL)", isCurrent: false,
+                epitaph: "\"Pioneer and scholar. His legacy paved the way for those to come.\"",
+                buriedOn: "12 Oct 1941", plotId: "A-142-1", preview: "Pioneer and scholar. His legacy paved...",
+                photo: "https://randomuser.me/api/portraits/men/33.jpg"
+            }
+        ];
+
+        function getInitials(name) {
+            const p = name.split(' '); return p.length >= 2 ? p[0][0] + p[1][0] : name[0];
+        }
+
+        const rl = document.getElementById('recordList');
+        records.forEach(rec => {
+            const di = document.createElement('div'); di.className = 'list-item';
+            di.onclick = () => openDash(rec);
+            di.innerHTML = `
+                <div class="avatar">${getInitials(rec.name)}</div>
+                <div class="item-content">
+                    <div class="item-row-top">
+                        <span class="item-name">${rec.name}</span>
+                        <span class="item-date">${rec.buriedOn}</span>
+                    </div>
+                    <div class="item-row-bottom">
+                        <span class="layer-badge ${rec.isCurrent ? 'current-layer' : ''}">${rec.layerTitle}</span>
+                        <span class="item-preview">${rec.preview}</span>
+                    </div>
+                </div>
+            `;
+            rl.appendChild(di);
+        });
+
+        const dv = document.getElementById('detailView');
+        function openDash(r) {
+            document.getElementById('dashLayerId').textContent = r.layerTitle;
+            document.getElementById('dashName').textContent = r.name;
+            document.getElementById('dashDates').textContent = r.dates;
+            document.getElementById('dashEpitaph').textContent = r.epitaph;
+            document.getElementById('dashBuriedOn').textContent = r.buriedOn;
+            document.getElementById('dashRef').textContent = r.plotId;
+            document.getElementById('dashPortrait').src = r.photo;
+            dv.classList.add('active');
+        }
+        function closeDetails() { dv.classList.remove('active'); }
+    </script>
+</body>
+</html>
